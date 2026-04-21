@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Petgle</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+        }
+        #game-container {
+            width: 100%;
+            height: 100%;
+        }
+        #game-container canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <script>
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const rawCode = params.get('discountCode');
+            window.GAME_CONFIG = {
+                discountCode: rawCode ? rawCode.toUpperCase() : 'PETGLE',
+                hasCode: !!rawCode,
+                balls: parseInt(params.get('balls'), 10) || 10,
+                theme: params.get('theme') || 'warm'
+            };
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@4.0.0/dist/phaser.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
