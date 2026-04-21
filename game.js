@@ -128,9 +128,10 @@ const soundBank = new SoundBank();
 // ---------------------------------------------------------------------------
 
 const DIFFICULTY = {
-    easy:   { spacing: 52, balls: 15, label: 'Easy' },
-    medium: { spacing: 42, balls: 10, label: 'Medium' },
-    hard:   { spacing: 34, balls: 7,  label: 'Hard' },
+    easy:       { spacing: 52, balls: 15, label: 'Easy' },
+    medium:     { spacing: 42, balls: 10, label: 'Medium' },
+    hard:       { spacing: 34, balls: 7,  label: 'Hard' },
+    impawsible: { spacing: 28, balls: 5,  label: 'Impawsible' },
 };
 
 const PegLayout = {
@@ -196,6 +197,7 @@ class BootScene extends Phaser.Scene {
         this._makeParticleTexture();
         this._makeGlowTexture();
         this._makeCatBucketTextures();
+        this._makeCatFaceTextures();
         this._makePawTexture();
         this._makeMouseIconTexture();
 
@@ -365,8 +367,8 @@ class BootScene extends Phaser.Scene {
         const darkGrey = 0x444444;
         const white = 0xF0F0F0;
         const pink = 0xF28B82;
-        const green = 0x4CAF50;
-        const greenDark = 0x2E7D32;
+        const gold = 0xE5A825;
+        const goldDark = 0xB8860B;
 
         // Helper to draw a cat face on a graphics object
         const drawCatFace = (h, cx, eyeState) => {
@@ -395,9 +397,9 @@ class BootScene extends Phaser.Scene {
                     const ex = cx + side * 9;
                     h.fillStyle(0xFFFFFF, 1);
                     h.fillCircle(ex, 26, 5);
-                    h.fillStyle(green, 1);
+                    h.fillStyle(gold, 1);
                     h.fillCircle(ex, 27, 4);
-                    h.fillStyle(greenDark, 1);
+                    h.fillStyle(goldDark, 1);
                     h.fillCircle(ex, 27, 3);
                     h.fillStyle(0x111111, 1);
                     h.fillCircle(ex, 26, 1.5);
@@ -452,6 +454,213 @@ class BootScene extends Phaser.Scene {
         drawCatFace(h2, 30, 'happy');
         h2.generateTexture('cat-bucket-happy', 60, 48);
         h2.destroy();
+    }
+
+    _makeCatFaceTextures () {
+        const black = 0x222222;
+        const darkGrey = 0x444444;
+        const white = 0xF0F0F0;
+        const pink = 0xF28B82;
+        const gold = 0xE5A825;
+        const goldDark = 0xB8860B;
+
+        const drawBase = (g, cx, cy, scale) => {
+            const s = scale;
+            // Ears
+            g.fillStyle(black, 1);
+            g.fillTriangle(cx - 24*s, cy - 14*s, cx - 14*s, cy - 28*s, cx - 8*s, cy - 14*s);
+            g.fillTriangle(cx + 24*s, cy - 14*s, cx + 14*s, cy - 28*s, cx + 8*s, cy - 14*s);
+            g.fillStyle(pink, 0.4);
+            g.fillTriangle(cx - 21*s, cy - 14*s, cx - 14*s, cy - 24*s, cx - 10*s, cy - 14*s);
+            g.fillTriangle(cx + 21*s, cy - 14*s, cx + 14*s, cy - 24*s, cx + 10*s, cy - 14*s);
+            // Head
+            g.fillStyle(black, 1);
+            g.fillCircle(cx, cy, 20*s);
+            g.fillCircle(cx, cy + 2*s, 18*s);
+            // Tuxedo white chest/chin
+            g.fillStyle(white, 0.6);
+            g.fillCircle(cx, cy + 10*s, 8*s);
+            // Fur shading
+            g.fillStyle(darkGrey, 0.2);
+            g.fillCircle(cx, cy - 4*s, 14*s);
+            // Nose
+            g.fillStyle(pink, 1);
+            g.fillTriangle(cx - 2*s, cy + 6*s, cx + 2*s, cy + 6*s, cx, cy + 8*s);
+            // Mouth
+            g.lineStyle(1*s, 0x666666, 0.6);
+            g.beginPath();
+            g.moveTo(cx, cy + 8*s); g.lineTo(cx - 4*s, cy + 11*s);
+            g.moveTo(cx, cy + 8*s); g.lineTo(cx + 4*s, cy + 11*s);
+            g.strokePath();
+            // Whiskers
+            g.lineStyle(1*s, 0x888888, 0.4);
+            for (const side of [-1, 1]) {
+                for (let i = -1; i <= 1; i++) {
+                    g.beginPath();
+                    g.moveTo(cx + side * 8*s, cy + 7*s + i * 2*s);
+                    g.lineTo(cx + side * 26*s, cy + 5*s + i * 3*s);
+                    g.strokePath();
+                }
+            }
+        };
+
+        const drawNormalEyes = (g, cx, cy, s) => {
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.fillStyle(0xFFFFFF, 1); g.fillCircle(ex, cy - 2*s, 5*s);
+                g.fillStyle(gold, 1);     g.fillCircle(ex, cy - 1*s, 4*s);
+                g.fillStyle(goldDark, 1); g.fillCircle(ex, cy - 1*s, 3*s);
+                g.fillStyle(0x111111, 1); g.fillCircle(ex, cy - 2*s, 1.5*s);
+                g.fillCircle(ex, cy, 1.5*s);
+                g.fillStyle(0xFFFFFF, 0.9); g.fillCircle(ex + 1.5*s, cy - 3*s, 1*s);
+            }
+        };
+
+        const drawHappyEyes = (g, cx, cy, s) => {
+            g.lineStyle(2.5*s, 0x111111, 1);
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.beginPath();
+                g.moveTo(ex - 4*s, cy); g.lineTo(ex, cy - 4*s); g.lineTo(ex + 4*s, cy);
+                g.strokePath();
+            }
+        };
+
+        const drawSleepyEyes = (g, cx, cy, s) => {
+            g.lineStyle(2.5*s, 0x111111, 1);
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.beginPath();
+                g.moveTo(ex - 4*s, cy - 1*s); g.lineTo(ex + 4*s, cy - 1*s);
+                g.strokePath();
+            }
+        };
+
+        const drawWideEyes = (g, cx, cy, s) => {
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.fillStyle(0xFFFFFF, 1); g.fillCircle(ex, cy - 2*s, 6*s);
+                g.fillStyle(gold, 1);     g.fillCircle(ex, cy - 1*s, 4.5*s);
+                g.fillStyle(goldDark, 1); g.fillCircle(ex, cy - 1*s, 3*s);
+                g.fillStyle(0x111111, 1); g.fillCircle(ex, cy - 1*s, 2*s);
+                g.fillStyle(0xFFFFFF, 0.9); g.fillCircle(ex + 1.5*s, cy - 3*s, 1.2*s);
+            }
+        };
+
+        const drawSadEyes = (g, cx, cy, s) => {
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.fillStyle(0xFFFFFF, 1); g.fillCircle(ex, cy - 2*s, 5*s);
+                g.fillStyle(gold, 0.7);   g.fillCircle(ex, cy - 1*s, 4*s);
+                g.fillStyle(goldDark, 0.7);g.fillCircle(ex, cy - 1*s, 3*s);
+                g.fillStyle(0x111111, 1); g.fillCircle(ex, cy, 1.5*s);
+                // Sad eyebrows angled down inward
+                g.lineStyle(2*s, 0x111111, 0.7);
+                g.beginPath();
+                g.moveTo(ex - side * 5*s, cy - 8*s);
+                g.lineTo(ex + side * 3*s, cy - 6*s);
+                g.strokePath();
+            }
+        };
+
+        const drawProudEyes = (g, cx, cy, s) => {
+            // Half-lidded confident look
+            for (const side of [-1, 1]) {
+                const ex = cx + side * 9*s;
+                g.fillStyle(0xFFFFFF, 1); g.fillCircle(ex, cy - 1*s, 5*s);
+                g.fillStyle(gold, 1);     g.fillCircle(ex, cy, 4*s);
+                g.fillStyle(goldDark, 1); g.fillCircle(ex, cy, 3*s);
+                g.fillStyle(0x111111, 1); g.fillCircle(ex, cy, 1.5*s);
+                g.fillStyle(0xFFFFFF, 0.9); g.fillCircle(ex + 1*s, cy - 2*s, 1*s);
+                // Eyelid
+                g.fillStyle(black, 1);
+                g.fillCircle(ex, cy - 4*s, 4*s);
+            }
+        };
+
+        const SIZE = 64;
+        const c = SIZE / 2;
+        const sc = 1.1;
+
+        const faces = [
+            { key: 'cat-face-normal',   eyes: drawNormalEyes },
+            { key: 'cat-face-happy',    eyes: drawHappyEyes },
+            { key: 'cat-face-sleepy',   eyes: drawSleepyEyes },
+            { key: 'cat-face-surprised',eyes: drawWideEyes },
+            { key: 'cat-face-sad',      eyes: drawSadEyes },
+            { key: 'cat-face-proud',    eyes: drawProudEyes },
+        ];
+
+        for (const f of faces) {
+            const g = this._g();
+            drawBase(g, c, c, sc);
+            f.eyes(g, c, c, sc);
+            g.generateTexture(f.key, SIZE, SIZE);
+            g.destroy();
+        }
+
+        // Fire cat — surprised face wreathed in flames (80x80 to fit fire)
+        const FSIZE = 80;
+        const fc = FSIZE / 2;
+        const fg = this._g();
+        // Flames behind the cat
+        const flameColors = [
+            { c: 0xFF4500, a: 0.5 }, { c: 0xFF6600, a: 0.6 },
+            { c: 0xFFAA00, a: 0.5 }, { c: 0xFFDD00, a: 0.4 },
+        ];
+        for (let i = 0; i < 7; i++) {
+            const fl = flameColors[i % flameColors.length];
+            const angle = (i / 7) * Math.PI * 2 - Math.PI / 2;
+            const dist = 22 + (i % 2) * 6;
+            const fx = fc + Math.cos(angle) * dist;
+            const fy = fc + Math.sin(angle) * dist - 4;
+            fg.fillStyle(fl.c, fl.a);
+            fg.fillCircle(fx, fy, 10 + (i % 3) * 3);
+        }
+        // Extra tall flames on top
+        fg.fillStyle(0xFF4500, 0.6); fg.fillCircle(fc - 8, fc - 30, 8);
+        fg.fillStyle(0xFF6600, 0.5); fg.fillCircle(fc + 6, fc - 28, 7);
+        fg.fillStyle(0xFFAA00, 0.4); fg.fillCircle(fc, fc - 34, 6);
+        fg.fillStyle(0xFFDD00, 0.3); fg.fillCircle(fc + 10, fc - 26, 5);
+        fg.fillStyle(0xFF4500, 0.4); fg.fillCircle(fc - 12, fc - 24, 6);
+        // Draw the cat face on top
+        drawBase(fg, fc, fc, sc);
+        drawWideEyes(fg, fc, fc, sc);
+        fg.generateTexture('cat-face-fire', FSIZE, FSIZE);
+        fg.destroy();
+
+        // Impawsible cat — determined face with glowing aura
+        const ig = this._g();
+        // Intense red/purple aura
+        ig.fillStyle(0x9B59B6, 0.2); ig.fillCircle(fc, fc, 36);
+        ig.fillStyle(0xFF0044, 0.15); ig.fillCircle(fc, fc, 32);
+        ig.fillStyle(0xFF0044, 0.1); ig.fillCircle(fc, fc, 28);
+        // Draw cat face
+        drawBase(ig, fc, fc, sc);
+        drawProudEyes(ig, fc, fc, sc);
+        // Glowing eye highlights — intense golden flare
+        for (const side of [-1, 1]) {
+            const ex = fc + side * 9 * sc;
+            ig.fillStyle(0xFFDD00, 0.4); ig.fillCircle(ex, fc, 6 * sc);
+        }
+        ig.generateTexture('cat-face-impawsible', FSIZE, FSIZE);
+        ig.destroy();
+
+        // Small versions for floating background (32px)
+        const SM = 32;
+        const sc2 = 0.55;
+        const smFaces = [
+            { key: 'cat-face-sm-normal', eyes: drawNormalEyes },
+            { key: 'cat-face-sm-sleepy', eyes: drawSleepyEyes },
+            { key: 'cat-face-sm-happy',  eyes: drawHappyEyes },
+        ];
+        for (const f of smFaces) {
+            const g = this._g();
+            drawBase(g, SM / 2, SM / 2, sc2);
+            f.eyes(g, SM / 2, SM / 2, sc2);
+            g.generateTexture(f.key, SM, SM);
+            g.destroy();
+        }
     }
 
     _makePawTexture () {
@@ -541,107 +750,228 @@ class TitleScene extends Phaser.Scene {
     constructor () { super({ key: 'Title' }); }
 
     create () {
-        const cx = this.scale.width / 2;
-        const cy = this.scale.height / 2;
+        const W = this.scale.width;
+        const H = this.scale.height;
+        const cx = W / 2;
+        const cy = H / 2;
 
-        // background paw prints
-        this._spawnPawPrints();
+        // Colorful gradient background
+        const bg = this.add.graphics().setDepth(-10);
+        bg.fillStyle(0x1a1a2e, 1);
+        bg.fillRect(0, 0, W, H);
 
+        // Floating cat faces and icons
+        const smCatKeys = ['cat-face-sm-normal', 'cat-face-sm-sleepy', 'cat-face-sm-happy'];
+        const floaterCount = 12;
+        for (let i = 0; i < floaterCount; i++) {
+            const x = Phaser.Math.Between(40, W - 40);
+            const y = Phaser.Math.Between(40, H - 40);
+            let e;
+            if (i % 3 === 0) {
+                e = this.add.image(x, y, smCatKeys[i % smCatKeys.length]).setDepth(-5).setAlpha(0);
+                e.setScale(Phaser.Math.FloatBetween(0.7, 1.2));
+            } else {
+                const icons = ['🐾', '🐟', '🐭', '🧶', '✨'];
+                e = this.add.text(x, y, icons[i % icons.length], { fontSize: Phaser.Math.Between(18, 28) + 'px' })
+                    .setDepth(-5).setAlpha(0);
+            }
+            this.tweens.add({
+                targets: e,
+                alpha: { from: 0, to: 0.18 },
+                y: y - Phaser.Math.Between(80, 200),
+                rotation: Phaser.Math.FloatBetween(-0.2, 0.2),
+                duration: Phaser.Math.Between(5000, 10000),
+                repeat: -1,
+                delay: Phaser.Math.Between(0, 4000),
+                yoyo: false,
+                onRepeat: () => {
+                    e.x = Phaser.Math.Between(40, W - 40);
+                    e.y = Phaser.Math.Between(H * 0.5, H);
+                    e.setAlpha(0);
+                },
+            });
+        }
+
+        // Cat face above title — drawn sprite with speech bubbles
+        const catFace = this.add.image(cx, cy - 150, 'cat-face-normal').setOrigin(0.5).setScale(1.6);
+        this.tweens.add({
+            targets: catFace,
+            y: cy - 142,
+            rotation: { from: -0.06, to: 0.06 },
+            yoyo: true,
+            repeat: -1,
+            duration: 800,
+            ease: 'Sine.easeInOut',
+        });
+
+        // Blinking: swap to sleepy eyes briefly
+        this.time.addEvent({
+            delay: 2500, loop: true,
+            callback: () => {
+                catFace.setTexture('cat-face-sleepy');
+                this.time.delayedCall(150, () => catFace.setTexture('cat-face-normal'));
+            },
+        });
+
+        // Speech bubble
+        const meows = ['Mrow!', 'Prrr~', 'Mew!', '*purr*', 'Nya~'];
+        const speechBg = this.add.graphics().setDepth(5).setAlpha(0);
+        const speechText = this.add.text(cx + 62, cy - 192, meows[0], {
+            fontFamily: 'Arial, sans-serif', fontSize: '13px', fontStyle: 'bold',
+            color: '#333333',
+        }).setOrigin(0.5).setAlpha(0).setDepth(6);
+
+        const drawBubble = () => {
+            speechBg.clear();
+            speechBg.fillStyle(0xFFFFFF, 0.9);
+            speechBg.fillRoundedRect(cx + 36, cy - 206, 52, 24, 8);
+            // Tail pointing to cat
+            speechBg.fillTriangle(cx + 44, cy - 184, cx + 36, cy - 182, cx + 48, cy - 182);
+        };
+        drawBubble();
+
+        let meowIdx = 0;
+        this.time.addEvent({
+            delay: 3000, loop: true,
+            callback: () => {
+                meowIdx = (meowIdx + 1) % meows.length;
+                speechText.setText(meows[meowIdx]);
+                drawBubble();
+                this.tweens.add({ targets: [speechBg, speechText], alpha: 1, duration: 200, yoyo: true, hold: 1200, ease: 'Sine.easeInOut' });
+            },
+        });
+
+        // Title with rainbow-ish letter coloring
         const title = this.add.text(cx, cy - 80, 'PETGLE', {
             fontFamily: 'Arial Black, Impact, sans-serif',
-            fontSize: '72px',
+            fontSize: '80px',
             color: '#FFD700',
             stroke: '#FF6B35',
-            strokeThickness: 6,
+            strokeThickness: 8,
+            shadow: { offsetX: 3, offsetY: 3, color: '#000', blur: 8, fill: true },
         }).setOrigin(0.5);
 
         this.tweens.add({
             targets: title,
-            scaleX: 1.05,
-            scaleY: 1.05,
+            scaleX: 1.06,
+            scaleY: 1.06,
             yoyo: true,
             repeat: -1,
             duration: 1200,
             ease: 'Sine.easeInOut',
         });
 
-        this.add.text(cx, cy, 'Aim & shoot to reveal your reward!', {
+        // Playful subtitle
+        const sub = this.add.text(cx, cy - 10, 'Swat the mice, catch the fish!', {
             fontFamily: 'Arial, sans-serif',
-            fontSize: '22px',
-            color: '#F7F0E0',
+            fontSize: '20px',
+            color: '#B8A9E8',
         }).setOrigin(0.5);
+        this.tweens.add({
+            targets: sub,
+            alpha: { from: 0.6, to: 1 },
+            yoyo: true,
+            repeat: -1,
+            duration: 2000,
+        });
 
-        const buttonColors = { easy: '#4ECDC4', medium: '#FFD700', hard: '#FF6B35' };
-        const keys = ['easy', 'medium', 'hard'];
-        const btnWidth = 160;
-        const totalWidth = keys.length * btnWidth + (keys.length - 1) * 20;
-        const startX = cx - totalWidth / 2 + btnWidth / 2;
+        // Difficulty buttons with cat face sprites — 2x2 grid
+        const btnData = [
+            { key: 'easy',       color: 0x4ECDC4, hex: '#4ECDC4', face: 'cat-face-sleepy',      label: 'Easy' },
+            { key: 'medium',     color: 0xFFD700, hex: '#FFD700', face: 'cat-face-normal',       label: 'Medium' },
+            { key: 'hard',       color: 0xFF6B35, hex: '#FF6B35', face: 'cat-face-fire',         label: 'Hard' },
+            { key: 'impawsible', color: 0xFF0044, hex: '#FF0044', face: 'cat-face-impawsible',   label: 'Impawsible' },
+        ];
+        const btnWidth = 190;
+        const btnHeight = 48;
+        const gapX = 20;
+        const gapY = 16;
+        const cols = 2;
 
-        keys.forEach((key, i) => {
-            const diff = DIFFICULTY[key];
-            const bx = startX + i * (btnWidth + 20);
-            const by = cy + 70;
+        btnData.forEach((bd, i) => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const bx = cx + (col === 0 ? -(btnWidth / 2 + gapX / 2) : (btnWidth / 2 + gapX / 2));
+            const by = cy + 55 + row * (btnHeight + gapY);
 
-            const bg = this.add.graphics();
-            bg.fillStyle(Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.2);
-            bg.fillRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
-            bg.lineStyle(2, Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.6);
-            bg.strokeRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
+            const gfx = this.add.graphics();
+            const drawBtn = (fill, strokeA) => {
+                gfx.clear();
+                gfx.fillStyle(bd.color, fill);
+                gfx.fillRoundedRect(bx - btnWidth / 2, by - btnHeight / 2, btnWidth, btnHeight, 14);
+                gfx.lineStyle(2.5, bd.color, strokeA);
+                gfx.strokeRoundedRect(bx - btnWidth / 2, by - btnHeight / 2, btnWidth, btnHeight, 14);
+            };
+            drawBtn(0.15, 0.5);
 
-            const label = this.add.text(bx, by, diff.label, {
+            const faceScale = bd.face.includes('fire') || bd.face.includes('impawsible') ? 0.4 : 0.5;
+            const catIcon = this.add.image(bx - 50, by, bd.face).setOrigin(0.5).setScale(faceScale);
+            const label = this.add.text(bx + 10, by, bd.label, {
                 fontFamily: 'Arial, sans-serif',
-                fontSize: '24px',
-                color: buttonColors[key],
+                fontSize: '22px',
+                fontStyle: 'bold',
+                color: bd.hex,
             }).setOrigin(0.5);
 
-            const hitArea = this.add.rectangle(bx, by, btnWidth, 44).setInteractive({ useHandCursor: true }).setAlpha(0.001);
+            const hitArea = this.add.rectangle(bx, by, btnWidth, btnHeight).setInteractive({ useHandCursor: true }).setAlpha(0.001);
 
             hitArea.on('pointerover', () => {
-                bg.clear();
-                bg.fillStyle(Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.35);
-                bg.fillRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
-                bg.lineStyle(2, Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.9);
-                bg.strokeRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
-                label.setScale(1.05);
+                drawBtn(0.35, 1);
+                label.setScale(1.08);
+                catIcon.setScale(faceScale * 1.2);
             });
-
             hitArea.on('pointerout', () => {
-                bg.clear();
-                bg.fillStyle(Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.2);
-                bg.fillRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
-                bg.lineStyle(2, Phaser.Display.Color.HexStringToColor(buttonColors[key]).color, 0.6);
-                bg.strokeRoundedRect(bx - btnWidth / 2, by - 22, btnWidth, 44, 10);
+                drawBtn(0.15, 0.5);
                 label.setScale(1);
+                catIcon.setScale(faceScale);
             });
-
             hitArea.on('pointerdown', () => {
                 soundBank.resume();
-                window.GAME_CONFIG.difficulty = key;
-                window.parent.postMessage({ type: 'GAME_STARTED', difficulty: key }, '*');
+                window.GAME_CONFIG.difficulty = bd.key;
+                window.parent.postMessage({ type: 'GAME_STARTED', difficulty: bd.key }, '*');
                 this.scene.start('Game');
             });
-        });
-    }
 
-    _spawnPawPrints () {
-        for (let i = 0; i < 12; i++) {
-            const x = Phaser.Math.Between(50, this.scale.width - 50);
-            const y = Phaser.Math.Between(50, this.scale.height - 50);
-            const t = this.add.text(x, y, '🐾', { fontSize: '28px' }).setAlpha(0.06);
+            // Gentle bob
             this.tweens.add({
-                targets: t,
-                y: y - 120,
-                alpha: 0,
-                duration: Phaser.Math.Between(6000, 12000),
+                targets: [label, catIcon],
+                y: '-=2',
+                yoyo: true,
                 repeat: -1,
-                delay: Phaser.Math.Between(0, 4000),
-                onRepeat: () => {
-                    t.x = Phaser.Math.Between(50, this.scale.width - 50);
-                    t.y = Phaser.Math.Between(this.scale.height * 0.5, this.scale.height);
-                    t.setAlpha(0.06);
-                },
+                duration: 1400,
+                delay: i * 200,
+                ease: 'Sine.easeInOut',
             });
-        }
+
+            // Fire cat gets flickering flames
+            if (bd.key === 'hard') {
+                this.tweens.add({
+                    targets: catIcon,
+                    scaleX: faceScale * 1.05, scaleY: faceScale * 1.1,
+                    yoyo: true, repeat: -1,
+                    duration: 200 + Math.random() * 100,
+                    ease: 'Sine.easeInOut',
+                });
+            }
+            // Impawsible cat gets a menacing pulse
+            if (bd.key === 'impawsible') {
+                this.tweens.add({
+                    targets: catIcon,
+                    alpha: { from: 0.8, to: 1 },
+                    scaleX: faceScale * 1.08, scaleY: faceScale * 1.08,
+                    yoyo: true, repeat: -1,
+                    duration: 600,
+                    ease: 'Sine.easeInOut',
+                });
+            }
+        });
+
+        // Footer hint
+        this.add.text(cx, H - 30, 'Left-click to fire  ·  Right-click toggles laser', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '13px',
+            color: '#8888AA',
+        }).setOrigin(0.5).setAlpha(0.7);
     }
 }
 
@@ -707,7 +1037,7 @@ class GameScene extends Phaser.Scene {
         const g = this.add.graphics();
         g.fillStyle(COLORS.bg, 1);
         g.fillRect(0, 0, W, H);
-        g.fillStyle(COLORS.bgLight, 0.15);
+        g.fillStyle(COLORS.bgLight, 0.12);
         g.fillCircle(W / 2, H / 2, 340);
         g.setDepth(-10);
     }
@@ -897,6 +1227,12 @@ class GameScene extends Phaser.Scene {
             event.pairs.forEach((pair) => {
                 const goA = getGameObject(pair.bodyA);
                 const goB = getGameObject(pair.bodyB);
+
+                // Reset timeout on any ball collision (pegs, walls, etc.)
+                const ballGo = (goA && goA.isBall) ? goA : (goB && goB.isBall) ? goB : null;
+                if (ballGo && ballGo.active) {
+                    ballGo._spawnTime = this.time.now;
+                }
 
                 // Bucket detection (bucket is a raw body, not a game object)
                 const isBucketA = pair.bodyA === this.bucketBody || pair.bodyA.parent === this.bucketBody;
@@ -1219,20 +1555,23 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(delay || 0, () => {
             const t = this.add.text(this.scale.width / 2, this.scale.height / 2, msg, {
                 fontFamily: 'Arial Black, Impact, sans-serif',
-                fontSize: '40px',
+                fontSize: '44px',
                 color: '#FFD700',
                 stroke: '#FF6B35',
-                strokeThickness: 4,
+                strokeThickness: 5,
+                shadow: { offsetX: 2, offsetY: 2, color: '#000', blur: 8, fill: true },
             }).setOrigin(0.5).setDepth(30).setAlpha(0);
 
             this.tweens.add({
                 targets: t,
                 alpha: 1,
-                scaleX: { from: 0.5, to: 1.2 },
-                scaleY: { from: 0.5, to: 1.2 },
-                duration: 300,
+                scaleX: { from: 0.4, to: 1.3 },
+                scaleY: { from: 0.4, to: 1.3 },
+                y: this.scale.height / 2 - 20,
+                duration: 350,
                 yoyo: true,
-                hold: 400,
+                hold: 450,
+                ease: 'Back.easeOut',
                 onComplete: () => t.destroy(),
             });
         });
@@ -1241,21 +1580,23 @@ class GameScene extends Phaser.Scene {
     // ----- Background paw prints -----
 
     _spawnPawPrints () {
+        const smKeys = ['cat-face-sm-normal', 'cat-face-sm-sleepy', 'cat-face-sm-happy'];
         for (let i = 0; i < 8; i++) {
             const x = Phaser.Math.Between(50, this.scale.width - 50);
             const y = Phaser.Math.Between(50, this.scale.height - 50);
-            const t = this.add.text(x, y, '🐾', { fontSize: '24px' }).setAlpha(0.04).setDepth(-5);
+            const t = this.add.image(x, y, smKeys[i % smKeys.length])
+                .setAlpha(0.06).setDepth(-5).setScale(Phaser.Math.FloatBetween(0.6, 1));
             this.tweens.add({
                 targets: t,
                 y: y - 150,
                 alpha: 0,
-                duration: Phaser.Math.Between(8000, 14000),
+                duration: Phaser.Math.Between(7000, 13000),
                 repeat: -1,
                 delay: Phaser.Math.Between(0, 5000),
                 onRepeat: () => {
                     t.x = Phaser.Math.Between(50, this.scale.width - 50);
                     t.y = Phaser.Math.Between(this.scale.height * 0.5, this.scale.height);
-                    t.setAlpha(0.04);
+                    t.setAlpha(0.06);
                 },
             });
         }
@@ -1337,84 +1678,177 @@ class WinScene extends Phaser.Scene {
         window.parent.postMessage(msg, '*');
         soundBank.winJingle();
 
+        // Colorful background
+        const bg = this.add.graphics().setDepth(0);
+        bg.fillStyle(0x1a1a2e, 1);
+        bg.fillRect(0, 0, W, H);
+
         // Background flash
-        const flash = this.add.rectangle(W / 2, H / 2, W, H, 0xFFFFFF).setAlpha(0.6).setDepth(0);
+        const flash = this.add.rectangle(W / 2, H / 2, W, H, 0xFFFFFF).setAlpha(0.6).setDepth(1);
         this.tweens.add({ targets: flash, alpha: 0, duration: 600 });
 
-        // Confetti
+        // Subtle confetti
         const emitter = this.add.particles(W / 2, -20, 'particle', {
             x: { min: -W / 2, max: W / 2 },
-            speed: { min: 100, max: 300 },
-            angle: { min: 70, max: 110 },
-            scale: { start: 1.5, end: 0.3 },
-            alpha: { start: 1, end: 0.5 },
+            speed: { min: 60, max: 180 },
+            angle: { min: 75, max: 105 },
+            scale: { start: 1, end: 0.2 },
+            alpha: { start: 0.7, end: 0.2 },
             lifespan: 3000,
-            gravityY: 150,
-            quantity: 3,
-            frequency: 50,
-            tint: [COLORS.orange, COLORS.blue, COLORS.green, COLORS.gold, COLORS.purple],
+            gravityY: 80,
+            quantity: 1,
+            frequency: 120,
+            tint: [COLORS.orange, COLORS.blue, COLORS.green, COLORS.gold],
         });
-        emitter.setDepth(1);
+        emitter.setDepth(2);
+
+        // Happy celebrating cat — drawn sprite
+        const cat = this.add.image(W / 2, H / 2 - 155, 'cat-face-happy').setOrigin(0.5).setDepth(10).setScale(2);
+        this.tweens.add({
+            targets: cat,
+            y: H / 2 - 145,
+            scaleX: 2.15, scaleY: 2.15,
+            yoyo: true, repeat: -1,
+            duration: 600,
+            ease: 'Sine.easeInOut',
+        });
+        // Victory sparkle particles orbiting the cat
+        const sparkleCount = 5;
+        for (let i = 0; i < sparkleCount; i++) {
+            const sp = this.add.image(W / 2, H / 2 - 155, 'glow').setOrigin(0.5).setDepth(10).setScale(0.3);
+            sp.setTint([COLORS.gold, COLORS.orange, COLORS.green, 0x4ECDC4, 0xB8A9E8][i]);
+            const angle = (i / sparkleCount) * Math.PI * 2;
+            const radius = 55;
+            this.tweens.addCounter({
+                from: 0, to: 360, duration: 2400, repeat: -1,
+                onUpdate: (tween) => {
+                    const a = Phaser.Math.DegToRad(tween.getValue()) + angle;
+                    sp.x = W / 2 + Math.cos(a) * radius;
+                    sp.y = H / 2 - 150 + Math.sin(a) * (radius * 0.5);
+                },
+            });
+        }
+        // "Purrfect!" speech bubble
+        const bubbleGfx = this.add.graphics().setDepth(11).setAlpha(0);
+        bubbleGfx.fillStyle(0xFFFFFF, 0.9);
+        bubbleGfx.fillRoundedRect(W / 2 + 42, H / 2 - 210, 80, 28, 10);
+        bubbleGfx.fillTriangle(W / 2 + 50, H / 2 - 184, W / 2 + 42, H / 2 - 182, W / 2 + 56, H / 2 - 182);
+        const winSpeech = this.add.text(W / 2 + 82, H / 2 - 196, 'Purrfect!', {
+            fontFamily: 'Arial, sans-serif', fontSize: '14px', fontStyle: 'bold',
+            color: '#333',
+        }).setOrigin(0.5).setDepth(12).setAlpha(0);
+        this.tweens.add({ targets: [bubbleGfx, winSpeech], alpha: 1, duration: 600, delay: 500, ease: 'Back.easeOut' });
+        this.tweens.add({ targets: [bubbleGfx, winSpeech], alpha: 0.7, yoyo: true, repeat: -1, duration: 1500, delay: 1100 });
 
         // Win text
-        this.add.text(W / 2, H / 2 - 100, 'YOU WIN!', {
+        const winText = this.add.text(W / 2, H / 2 - 90, 'YOU WIN!', {
             fontFamily: 'Arial Black, Impact, sans-serif',
-            fontSize: '64px',
+            fontSize: '68px',
             color: '#FFD700',
             stroke: '#FF6B35',
-            strokeThickness: 6,
+            strokeThickness: 8,
+            shadow: { offsetX: 3, offsetY: 3, color: '#000', blur: 10, fill: true },
         }).setOrigin(0.5).setDepth(10);
 
+        this.tweens.add({
+            targets: winText,
+            scaleX: 1.04, scaleY: 1.04,
+            yoyo: true, repeat: -1,
+            duration: 600,
+            ease: 'Sine.easeInOut',
+        });
+
         if (hasCode) {
-            const codeText = this.add.text(W / 2, H / 2 - 20, code, {
+            const codeText = this.add.text(W / 2, H / 2 - 10, code, {
                 fontFamily: '"Courier New", monospace',
-                fontSize: '48px',
+                fontSize: '44px',
                 color: '#FFD700',
                 stroke: '#1a1a2e',
                 strokeThickness: 4,
-            }).setOrigin(0.5).setDepth(10);
+            }).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
 
             this.tweens.add({
                 targets: codeText,
-                scaleX: 1.08,
-                scaleY: 1.08,
-                yoyo: true,
-                repeat: -1,
-                duration: 600,
+                scaleX: 1.06, scaleY: 1.06,
+                yoyo: true, repeat: -1,
+                duration: 700,
                 ease: 'Sine.easeInOut',
             });
 
-            this.add.text(W / 2, H / 2 + 40, `Use code ${code} for a discount!`, {
+            const copyHint = this.add.text(W / 2, H / 2 + 40, 'Click code to copy', {
                 fontFamily: 'Arial, sans-serif',
-                fontSize: '22px',
-                color: '#F7F0E0',
+                fontSize: '16px',
+                color: '#8888AA',
             }).setOrigin(0.5).setDepth(10);
+
+            codeText.on('pointerover', () => codeText.setColor('#FFEE88'));
+            codeText.on('pointerout', () => codeText.setColor('#FFD700'));
+            codeText.on('pointerdown', () => {
+                navigator.clipboard.writeText(code).then(() => {
+                    copyHint.setText('Copied!');
+                    copyHint.setColor('#4ECDC4');
+                    this.time.delayedCall(2000, () => {
+                        copyHint.setText('Click code to copy');
+                        copyHint.setColor('#8888AA');
+                    });
+                });
+            });
         } else {
-            this.add.text(W / 2, H / 2 - 10, 'Great job! 🐱', {
+            this.add.text(W / 2, H / 2, 'Purrfect score!', {
                 fontFamily: 'Arial, sans-serif',
-                fontSize: '28px',
-                color: '#F7F0E0',
+                fontSize: '30px',
+                fontStyle: 'bold',
+                color: '#B8A9E8',
             }).setOrigin(0.5).setDepth(10);
         }
 
-        this.add.text(W / 2, H / 2 + 90, `Score: ${score}`, {
+        this.add.text(W / 2, H / 2 + 90, `🏆  Score: ${score}`, {
             fontFamily: 'Arial, sans-serif',
-            fontSize: '20px',
+            fontSize: '22px',
             color: '#F7F0E0',
         }).setOrigin(0.5).setDepth(10);
 
         // Play again button
-        const btn = this.add.text(W / 2, H / 2 + 150, '▶  Play Again', {
-            fontFamily: 'Arial, sans-serif',
-            fontSize: '26px',
-            color: '#4ECDC4',
-            backgroundColor: '#1a1a2e',
-            padding: { x: 20, y: 10 },
-        }).setOrigin(0.5).setDepth(10).setInteractive({ useHandCursor: true });
+        const btnBg = this.add.graphics().setDepth(10);
+        const bx = W / 2, by = H / 2 + 140, bw = 200, bh = 46;
+        const drawPlayBtn = (fill) => {
+            btnBg.clear();
+            btnBg.fillStyle(0x4ECDC4, fill);
+            btnBg.fillRoundedRect(bx - bw / 2, by - bh / 2, bw, bh, 14);
+        };
+        drawPlayBtn(0.25);
 
-        btn.on('pointerover', () => btn.setColor('#FFD700'));
-        btn.on('pointerout', () => btn.setColor('#4ECDC4'));
+        const btn = this.add.text(bx, by, 'Play Again', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '22px',
+            fontStyle: 'bold',
+            color: '#4ECDC4',
+        }).setOrigin(0.5).setDepth(11).setInteractive({ useHandCursor: true });
+
+        btn.on('pointerover', () => { btn.setColor('#FFD700'); drawPlayBtn(0.4); });
+        btn.on('pointerout', () => { btn.setColor('#4ECDC4'); drawPlayBtn(0.25); });
         btn.on('pointerdown', () => this.scene.start('Game'));
+
+        // Change difficulty button
+        const diffBg = this.add.graphics().setDepth(10);
+        const dy = by + 54;
+        const drawDiffBtn = (fill) => {
+            diffBg.clear();
+            diffBg.fillStyle(0x9B59B6, fill);
+            diffBg.fillRoundedRect(bx - bw / 2, dy - bh / 2, bw, bh, 14);
+        };
+        drawDiffBtn(0.2);
+
+        const diffBtn = this.add.text(bx, dy, 'Change Difficulty', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '18px',
+            fontStyle: 'bold',
+            color: '#B8A9E8',
+        }).setOrigin(0.5).setDepth(11).setInteractive({ useHandCursor: true });
+
+        diffBtn.on('pointerover', () => { diffBtn.setColor('#FFD700'); drawDiffBtn(0.4); });
+        diffBtn.on('pointerout', () => { diffBtn.setColor('#B8A9E8'); drawDiffBtn(0.2); });
+        diffBtn.on('pointerdown', () => this.scene.start('Title'));
     }
 }
 
@@ -1435,50 +1869,139 @@ class GameOverScene extends Phaser.Scene {
         const hasCode = window.GAME_CONFIG.hasCode;
         window.parent.postMessage({ type: 'GAME_OVER', score }, '*');
 
+        // Colorful background
+        const bg = this.add.graphics().setDepth(0);
+        bg.fillStyle(0x1a1a2e, 1);
+        bg.fillRect(0, 0, W, H);
+
+        // Sad cat — drawn sprite
+        const cat = this.add.image(W / 2, H / 2 - 140, 'cat-face-sad').setOrigin(0.5).setScale(1.6);
+        this.tweens.add({
+            targets: cat,
+            y: H / 2 - 133,
+            rotation: { from: -0.04, to: 0.04 },
+            yoyo: true, repeat: -1,
+            duration: 2000,
+            ease: 'Sine.easeInOut',
+        });
+        // Thought bubble with sad thoughts
+        const thoughts = ['...mew', 'the fish...', '*sigh*', 'so close', '...mice'];
+        const bubbleGfx = this.add.graphics().setAlpha(0);
+        const drawThoughtBubble = () => {
+            bubbleGfx.clear();
+            bubbleGfx.fillStyle(0xFFFFFF, 0.7);
+            bubbleGfx.fillRoundedRect(W / 2 + 35, H / 2 - 190, 72, 24, 8);
+            bubbleGfx.fillCircle(W / 2 + 32, H / 2 - 168, 4);
+            bubbleGfx.fillCircle(W / 2 + 28, H / 2 - 160, 2.5);
+        };
+        drawThoughtBubble();
+        const thoughtText = this.add.text(W / 2 + 71, H / 2 - 178, '', {
+            fontFamily: 'Arial, sans-serif', fontSize: '12px', fontStyle: 'italic',
+            color: '#555',
+        }).setOrigin(0.5).setAlpha(0);
+        let thoughtIdx = 0;
+        this.time.addEvent({
+            delay: 2500, loop: true,
+            callback: () => {
+                thoughtText.setText(thoughts[thoughtIdx % thoughts.length]);
+                thoughtIdx++;
+                drawThoughtBubble();
+                this.tweens.add({ targets: [bubbleGfx, thoughtText], alpha: 0.9, duration: 400, yoyo: true, hold: 1500, ease: 'Sine.easeInOut',
+                    onComplete: () => { bubbleGfx.setAlpha(0); thoughtText.setAlpha(0); }
+                });
+            },
+        });
+
         this.add.text(W / 2, H / 2 - 80, 'So Close!', {
             fontFamily: 'Arial Black, Impact, sans-serif',
             fontSize: '56px',
             color: '#FF6B35',
             stroke: '#1a1a2e',
-            strokeThickness: 4,
+            strokeThickness: 6,
+            shadow: { offsetX: 2, offsetY: 2, color: '#000', blur: 6, fill: true },
         }).setOrigin(0.5);
 
         if (hasCode) {
             let partial = '';
             for (let i = 0; i < code.length; i++) {
-                partial += i < revealed ? code[i] : '_';
-                if (i < code.length - 1) partial += ' ';
+                partial += i < revealed ? code[i] : '_ ';
+                if (i < code.length - 1 && i < revealed) partial += ' ';
             }
-            this.add.text(W / 2, H / 2, partial, {
+            this.add.text(W / 2, H / 2 + 5, partial, {
                 fontFamily: '"Courier New", monospace',
                 fontSize: '36px',
                 color: '#F7F0E0',
             }).setOrigin(0.5);
         } else {
-            this.add.text(W / 2, H / 2, `${revealed} / ${code.length} letters found`, {
+            this.add.text(W / 2, H / 2 + 5, `${revealed} / ${code.length} letters found`, {
                 fontFamily: 'Arial, sans-serif',
                 fontSize: '24px',
-                color: '#F7F0E0',
+                color: '#B8A9E8',
             }).setOrigin(0.5);
         }
 
-        this.add.text(W / 2, H / 2 + 50, `Score: ${score}`, {
+        this.add.text(W / 2, H / 2 + 55, `Score: ${score}`, {
             fontFamily: 'Arial, sans-serif',
             fontSize: '20px',
             color: '#F7F0E0',
         }).setOrigin(0.5);
 
-        const btn = this.add.text(W / 2, H / 2 + 120, '▶  Try Again?', {
+        // Encouraging message
+        const encouragements = [
+            '*nudges your hand* ...again?',
+            '*knocks ball off table* Try again!',
+            '*slow blink* You\'ve got this.',
+            '*sits on keyboard* More mice pls.',
+            '*chirps at screen* So close!',
+            '*kneads your arm encouragingly*',
+        ];
+        this.add.text(W / 2, H / 2 + 90, encouragements[Math.floor(Math.random() * encouragements.length)], {
             fontFamily: 'Arial, sans-serif',
-            fontSize: '26px',
+            fontSize: '18px',
+            color: '#8888CC',
+        }).setOrigin(0.5);
+
+        // Try again button
+        const btnBg = this.add.graphics();
+        const bx = W / 2, by = H / 2 + 135, bw = 200, bh = 46;
+        const drawRetryBtn = (fill) => {
+            btnBg.clear();
+            btnBg.fillStyle(0x4ECDC4, fill);
+            btnBg.fillRoundedRect(bx - bw / 2, by - bh / 2, bw, bh, 14);
+        };
+        drawRetryBtn(0.25);
+
+        const btn = this.add.text(bx, by, 'Try Again?', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '22px',
+            fontStyle: 'bold',
             color: '#4ECDC4',
-            backgroundColor: '#1a1a2e',
-            padding: { x: 20, y: 10 },
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
-        btn.on('pointerover', () => btn.setColor('#FFD700'));
-        btn.on('pointerout', () => btn.setColor('#4ECDC4'));
+        btn.on('pointerover', () => { btn.setColor('#FFD700'); drawRetryBtn(0.4); });
+        btn.on('pointerout', () => { btn.setColor('#4ECDC4'); drawRetryBtn(0.25); });
         btn.on('pointerdown', () => this.scene.start('Game'));
+
+        // Change difficulty button
+        const diffBg = this.add.graphics();
+        const dy = by + 56;
+        const drawDiffBtn = (fill) => {
+            diffBg.clear();
+            diffBg.fillStyle(0x9B59B6, fill);
+            diffBg.fillRoundedRect(bx - bw / 2, dy - bh / 2, bw, bh, 14);
+        };
+        drawDiffBtn(0.2);
+
+        const diffBtn = this.add.text(bx, dy, 'Change Difficulty', {
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '18px',
+            fontStyle: 'bold',
+            color: '#B8A9E8',
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        diffBtn.on('pointerover', () => { diffBtn.setColor('#FFD700'); drawDiffBtn(0.4); });
+        diffBtn.on('pointerout', () => { diffBtn.setColor('#B8A9E8'); drawDiffBtn(0.2); });
+        diffBtn.on('pointerdown', () => this.scene.start('Title'));
     }
 }
 
