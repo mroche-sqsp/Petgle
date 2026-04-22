@@ -29,22 +29,26 @@ Pass URL query parameters to customize the game:
 
 | Parameter      | Default     | Description                        |
 |----------------|-------------|------------------------------------|
-| `discountCode` | `GOODBOY10` | The code to reveal                 |
+| `rewardCode`   | —           | Reward code revealed on win (set by InteractiveBlock) |
+| `discountCode` | —           | Legacy alias for `rewardCode`      |
 | `balls`        | `10`        | Number of balls the player gets    |
 | `theme`        | `warm`      | Colour theme (stretch goal)        |
 
-Example: `https://your-site.github.io/petgle/?discountCode=WOOF20&balls=12`
+Example: `https://your-site.github.io/petgle/?rewardCode=WOOF20&balls=12`
 
-## postMessage Integration
+## InteractiveBlock Integration
 
-The game communicates with the parent frame via `window.parent.postMessage`:
+Conforms to the InteractiveBlock embed contract (§3). Messages are sent
+via `window.parent.postMessage` and are no-ops when loaded standalone.
 
-| Event         | Payload                                    |
-|---------------|--------------------------------------------|
-| `GAME_STARTED`| `{ type: 'GAME_STARTED' }`                |
-| `PROGRESS`    | `{ type: 'PROGRESS', revealed: 5, total: 9 }` |
-| `GAME_WON`    | `{ type: 'GAME_WON', score: 1500 }`       |
-| `GAME_OVER`   | `{ type: 'GAME_OVER', score: 800 }`       |
+| Event          | Payload                                    |
+|----------------|--------------------------------------------|
+| `STARTED`      | `{ type: 'STARTED' }`                      |
+| `GOAL_REACHED` | `{ type: 'GOAL_REACHED', score: 1500 }`   |
+| `ENDED`        | `{ type: 'ENDED', score: 800 }`            |
+
+`GOAL_REACHED` is sent at most once per play session; the flag resets
+when the player returns to the title screen and picks a new difficulty.
 
 ## Deployment
 

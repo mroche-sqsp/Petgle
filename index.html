@@ -6,6 +6,7 @@
     <title>Petgle</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { touch-action: none; }
         body {
             background: #1a1a2e;
             overflow: hidden;
@@ -29,7 +30,7 @@
     <script>
         (function() {
             const params = new URLSearchParams(window.location.search);
-            const rawCode = params.get('discountCode');
+            const rawCode = params.get('rewardCode') || params.get('discountCode');
             window.GAME_CONFIG = {
                 discountCode: rawCode ? rawCode.toUpperCase() : 'PETGLE',
                 hasCode: !!rawCode,

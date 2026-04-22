@@ -2,6 +2,21 @@
 //  Petgle — A Peggle-style browser game built with Phaser 4 + Matter.js
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+//  InteractiveBlock postMessage helper (see embed contract §3)
+// ---------------------------------------------------------------------------
+
+function postToHost (type, extra = {}) {
+    if (window.parent === window) return;
+    try {
+        window.parent.postMessage({ type, ...extra }, '*');
+    } catch {
+        window.parent.postMessage({ type }, '*');
+    }
+}
+
+let _goalReachedSent = false;
+
 const COLORS = {
     bg:        0x1a1a2e,
     orange:    0xFF6B35,
@@ -883,9 +898,9 @@ class TitleScene extends Phaser.Scene {
             { key: 'impawsible', color: 0xFF0044, hex: '#FF0044', face: 'cat-face-impawsible',   label: 'Impawsible' },
         ];
         const btnWidth = 190;
-        const btnHeight = 48;
+        const btnHeight = 54;
         const gapX = 20;
-        const gapY = 16;
+        const gapY = 14;
         const cols = 2;
 
         btnData.forEach((bd, i) => {
@@ -904,7 +919,7 @@ class TitleScene extends Phaser.Scene {
             };
             drawBtn(0.15, 0.5);
 
-            const faceScale = bd.face.includes('fire') || bd.face.includes('impawsible') ? 0.4 : 0.5;
+            const faceScale = bd.face.includes('fire') || bd.face.includes('impawsible') ? 0.35 : 0.5;
             const catIcon = this.add.image(bx - 50, by, bd.face).setOrigin(0.5).setScale(faceScale);
             const label = this.add.text(bx + 10, by, bd.label, {
                 fontFamily: 'Arial, sans-serif',
@@ -928,7 +943,8 @@ class TitleScene extends Phaser.Scene {
             hitArea.on('pointerdown', () => {
                 soundBank.resume();
                 window.GAME_CONFIG.difficulty = bd.key;
-                window.parent.postMessage({ type: 'GAME_STARTED', difficulty: bd.key }, '*');
+                _goalReachedSent = false;
+                postToHost('STARTED');
                 this.scene.start('Game');
             });
 
@@ -1482,13 +1498,8 @@ class GameScene extends Phaser.Scene {
 
         this.revealedCount++;
 
-        const progressMsg = {
-            type: 'PROGRESS',
-            revealed: this.revealedCount,
-            total: this.discountCode.length,
-        };
-        if (window.GAME_CONFIG.hasCode) progressMsg.code = this.discountCode;
-        window.parent.postMessage(progressMsg, '*');
+        // Progress is tracked internally; the block only accepts
+        // STARTED / GOAL_REACHED / ENDED per the embed contract.
     }
 
     // ----- Turn resolution -----
@@ -1673,9 +1684,10 @@ class WinScene extends Phaser.Scene {
         const code = data.code || window.GAME_CONFIG.discountCode;
 
         const hasCode = window.GAME_CONFIG.hasCode;
-        const msg = { type: 'GAME_WON', score };
-        if (hasCode) msg.code = code;
-        window.parent.postMessage(msg, '*');
+        if (!_goalReachedSent) {
+            _goalReachedSent = true;
+            postToHost('GOAL_REACHED', { score });
+        }
         soundBank.winJingle();
 
         // Colorful background
@@ -1867,7 +1879,7 @@ class GameOverScene extends Phaser.Scene {
         const revealed = data.revealedCount || 0;
 
         const hasCode = window.GAME_CONFIG.hasCode;
-        window.parent.postMessage({ type: 'GAME_OVER', score }, '*');
+        postToHost('ENDED', { score });
 
         // Colorful background
         const bg = this.add.graphics().setDepth(0);
