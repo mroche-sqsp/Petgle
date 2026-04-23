@@ -143,6 +143,7 @@ const soundBank = new SoundBank();
 // ---------------------------------------------------------------------------
 
 const DIFFICULTY = {
+    veryeasy:   { spacing: 75, balls: 15,  label: 'Very Easy' },
     easy:       { spacing: 52, balls: 15, label: 'Easy' },
     medium:     { spacing: 42, balls: 10, label: 'Medium' },
     hard:       { spacing: 34, balls: 7,  label: 'Hard' },
@@ -890,24 +891,26 @@ class TitleScene extends Phaser.Scene {
             duration: 2000,
         });
 
-        // Difficulty buttons with cat face sprites — 2x2 grid
+        // Difficulty buttons with cat face sprites — Very Easy centered on top, then 2x2 grid
         const btnData = [
-            { key: 'easy',       color: 0x4ECDC4, hex: '#4ECDC4', face: 'cat-face-sleepy',      label: 'Easy' },
-            { key: 'medium',     color: 0xFFD700, hex: '#FFD700', face: 'cat-face-normal',       label: 'Medium' },
-            { key: 'hard',       color: 0xFF6B35, hex: '#FF6B35', face: 'cat-face-fire',         label: 'Hard' },
-            { key: 'impawsible', color: 0xFF0044, hex: '#FF0044', face: 'cat-face-impawsible',   label: 'Impawsible' },
+            { key: 'veryeasy',   color: 0x88E0A0, hex: '#88E0A0', face: 'cat-face-happy',        label: 'Very Easy',  rowPos: [0, 0] },
+            { key: 'easy',       color: 0x4ECDC4, hex: '#4ECDC4', face: 'cat-face-sleepy',       label: 'Easy',       rowPos: [1, 0] },
+            { key: 'medium',     color: 0xFFD700, hex: '#FFD700', face: 'cat-face-normal',       label: 'Medium',     rowPos: [1, 1] },
+            { key: 'hard',       color: 0xFF6B35, hex: '#FF6B35', face: 'cat-face-fire',         label: 'Hard',       rowPos: [2, 0] },
+            { key: 'impawsible', color: 0xFF0044, hex: '#FF0044', face: 'cat-face-impawsible',   label: 'Impawsible', rowPos: [2, 1] },
         ];
         const btnWidth = 190;
-        const btnHeight = 54;
+        const btnHeight = 50;
         const gapX = 20;
-        const gapY = 14;
-        const cols = 2;
+        const gapY = 12;
 
         btnData.forEach((bd, i) => {
-            const col = i % cols;
-            const row = Math.floor(i / cols);
-            const bx = cx + (col === 0 ? -(btnWidth / 2 + gapX / 2) : (btnWidth / 2 + gapX / 2));
-            const by = cy + 55 + row * (btnHeight + gapY);
+            const [row, col] = bd.rowPos;
+            // Row 0 is a single centered button; other rows are 2-wide
+            const bx = row === 0
+                ? cx
+                : cx + (col === 0 ? -(btnWidth / 2 + gapX / 2) : (btnWidth / 2 + gapX / 2));
+            const by = cy + 45 + row * (btnHeight + gapY);
 
             const gfx = this.add.graphics();
             const drawBtn = (fill, strokeA) => {
